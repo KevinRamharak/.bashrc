@@ -1,14 +1,17 @@
 #!/bin/bash
 
+# config(ish)
 browser_bin="chromium"  # name/path of your browser executable
 default_action="search" # any valid action; defaults to 'search' when invalid or empty action
 
+# enable extended glob pattern matching
 shopt -s extglob
 
+# usage string : could use "" to avoid using 'cat'
 usage=$(cat <<USAGE
 google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
     OPTIONS:
-        -h, --help          -   Show this message
+        -h, --help          -   Show this message and exit
         -n, --new-window    -   Open in a new window
     
     ACTION:
@@ -28,7 +31,7 @@ google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
         sheet[s]            -   open Google Sheets
         slide[s]            -   open Google Slides"
 
-Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser
+Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser (or Firefox)
 @author  : Kevin Ramharak <kevin@ramharak.nl>
 @version : 1
 @git     : https://github.com/KevinRamharak/.bashrc
@@ -103,19 +106,20 @@ case "${args[0]}" in
     *)
         # if no [valid] action given try default
         # if default action is empty or invalid fall back to search
-        if [[ "$bash_google_default_action" -ne 1 ]]; then
+        if [[ "$bash_google_default_action" -ne 1]]; then
             # set a flag so we dont loop
             export bash_google_default_action=1
         else
-            # unset so we dont leave around stuff
-            unset bash_google_default_action
             default_action="search"
         fi
 
+        # call myself with default action and same arguments
         "$0" "$default_action" "$@"
         exit $?
 esac
 
-# fire up the browser
+# fire up the browser and make sure we dont receive no output
 "$browser_bin" "$flags" "$url" > /dev/null 2>&1 &
+
+# disown
 disown
