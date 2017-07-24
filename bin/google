@@ -1,0 +1,121 @@
+#!/bin/bash
+
+browser_bin="chromium"  # name/path of your browser executable
+default_action="search" # any valid action; defaults to 'search' when invalid or empty action
+
+shopt -s extglob
+
+usage=$(cat <<USAGE
+"google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
+    OPTIONS:
+        -h, --help          -   Show this message
+        -n, --new-window    -   Open in a new window
+    
+    ACTION:
+        url                 -   open Chromium with 'ARGS' as url
+        search              -   do a Google Search with 'ARGS' as query
+        contact[s]          -   open Google Contacts
+        map[s]              -   open Google Maps
+        hangout[s]          -   open Google Hangouts
+        group[s]            -   open Google Groups
+        site[s]             -   open Google Sites
+        translate           -   open Google Translate
+        mail                -   open Google Mail
+        drive               -   open Google Drive
+        calendar            -   open Google Calendar
+        keep                -   open Google Keep
+        doc[s]              -   open Google Documents
+        sheet[s]            -   open Google Sheets
+        slide[s]            -   open Google Slides"
+
+Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser
+@author  : Kevin Ramharak <kevin@ramharak.nl>
+@version : 1
+@git     : https://github.com/KevinRamharak/.bashrc
+USAGE
+)
+
+# loop trough args
+declare -a args
+for arg in "$@"; do
+    # search for help flag
+    if [[ "$arg" =~ ^(-h|--help)$ ]]; then
+        echo "$usage"
+        exit 1;
+    fi
+    # search for new window flag
+    if [[ "$arg" =~ ^(-n|--new-window)$ ]]; then
+        flags="$flags --new-window"
+        continue;
+    fi;
+    args=( "${args[@]}" "$arg" )
+done
+
+# check what arg we were given
+case "${args[0]}" in
+    contact?(s))
+        url="https://contacts.google.com"
+        ;;
+    map?(s))
+        url="https://www.google.com/maps"
+        ;;
+    hangout?(s))
+        url="https://hangouts.google.com"
+        ;;
+    group?(s))
+        url="https://groups.google.com"
+        ;;
+    site?(s))
+        url="https://sites.google.com"
+        ;;
+    translate)
+        url="https://translate.google.com"
+        ;;
+    mail)
+        url="https://mail.google.com"
+        ;;
+    drive)
+        url="https://drive.google.com"
+        ;;
+    calendar)
+        url="https://calendar.google.com"
+        ;;
+    keep)
+        url="https://keep.google.com"
+        ;;
+    doc?(s))
+        url="https://docs.google.com/document"
+        ;;
+    sheet?(s))
+        url="https://docs.google.com/spreadsheets"
+        ;;
+    slide?(s))
+        url="https://docs.google.com/presentation"
+        ;;
+    url)
+        # cut out the 'url' part of args
+        url="${args[@]:1}"
+        ;;
+    search)
+        # cut out the 'search' part of args
+        url="https://www.google.com/search?q=${args[@]:1}"
+        ;;
+    *)
+        # if no [valid] action given try default
+        # if default action is empty or invalid fall back to search
+        if [[ "$bash_google_default_action" -ne 1 ]]; then
+            # set a flag so we dont loop
+            export bash_google_default_action=1
+        else
+            # unset so we dont leave around stuff
+            unset bash_google_default_action
+            default_action="search"
+        fi
+
+        "$0" "$default_action" "$@"
+        exit $?
+esac
+
+# fire up the browser
+"$browser_bin" "$flags" "$url" > /dev/null 2>&1 &
+disown
