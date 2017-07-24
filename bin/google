@@ -6,7 +6,7 @@ default_action="search" # any valid action; defaults to 'search' when invalid or
 shopt -s extglob
 
 usage=$(cat <<USAGE
-"google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
+google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
     OPTIONS:
         -h, --help          -   Show this message
         -n, --new-window    -   Open in a new window
