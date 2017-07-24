@@ -123,7 +123,7 @@ case "${args[0]}" in
 esac
 
 # fire up the browser and make sure we dont receive no output
-"$browser_bin" "$flags" "$url" > /dev/null 2>&1 &
+"$browser_bin" $flags "$url" > /dev/null 2>&1 &
 
 # disown
 disown
