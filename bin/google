@@ -106,7 +106,7 @@ case "${args[0]}" in
     *)
         # if no [valid] action given try default
         # if default action is empty or invalid fall back to search
-        if [[ "$bash_google_default_action" -ne 1]]; then
+        if [[ "$bash_google_default_action" -ne 1 ]]; then
             # set a flag so we dont loop
             export bash_google_default_action=1
         else
