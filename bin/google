@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# config(ish)
-browser_bin="chromium"  # name/path of your browser executable
-default_action="search" # any valid action; defaults to 'search' when invalid or empty action
+# config(ish) - if you want to set these at .bashrc or something like that you could... (i do)
+if [[ -z "$browser_bin" ]]; then
+    browser_bin="chromium"  # name/path of your browser executable
+fi
+if [[ -z "$default_action" ]] ; then
+    default_action="search" # any valid action; defaults to 'search' when invalid or empty
+fi
 
 # enable extended glob pattern matching
 shopt -s extglob
