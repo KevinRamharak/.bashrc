@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# config(ish) - if you want to set these at .bashrc or something like that you could... (i do)
+# config(ish) - If you want to set these at 
 if [[ -z "$browser_bin" ]]; then
     browser_bin="chromium"  # name/path of your browser executable
 fi
-if [[ -z "$default_action" ]] ; then
-    default_action="search" # any valid action; defaults to 'search' when invalid or empty
+if [[ -z "$default_action" ]]; then
+    default_action="search" # any valid action; defaults to 'search' when invalid or empty action
 fi
 
 # enable extended glob pattern matching
@@ -13,27 +13,29 @@ shopt -s extglob
 
 # usage string : could use "" to avoid using 'cat'
 usage=$(cat <<USAGE
-google [-h|--help] [-n|--new-window] [ACTION='search'] [...ARGS]
+google [-h|--help] [-n|--new-window] [-C|--create] [ACTION='search'] [...ARGS]
     OPTIONS:
         -h, --help          -   Show this message and exit
         -n, --new-window    -   Open in a new window
-    
+        -C, --create        -   Create a new document of the application type, ignored when not applicable
+
     ACTION:
         url                 -   open Chromium with 'ARGS' as url
         search              -   do a Google Search with 'ARGS' as query
-        contact[s]          -   open Google Contacts
-        map[s]              -   open Google Maps
+        contact[s]          -   open Google Contacts [with 'ARGS' as search query]
+        map[s]              -   open Google Maps [with 'ARGS' as search query]
         hangout[s]          -   open Google Hangouts
         group[s]            -   open Google Groups
         site[s]             -   open Google Sites
         translate           -   open Google Translate
-        mail                -   open Google Mail
+        mail                -   open Google Mail [with 'ARGS' as search query]
         drive               -   open Google Drive
         calendar            -   open Google Calendar
         keep                -   open Google Keep
         doc[s]              -   open Google Documents
         sheet[s]            -   open Google Sheets
-        slide[s]            -   open Google Slides"
+        slide[s]            -   open Google Slides
+        draw[ing]           -   open Google Drawings
 
 Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser (or Firefox)
 @author  : Kevin Ramharak <kevin@ramharak.nl>
@@ -55,16 +57,22 @@ for arg in "$@"; do
         flags="$flags --new-window"
         continue;
     fi;
+    
+    # search for new window flag
+    if [[ "$arg" =~ ^(-C|--create)$ ]]; then
+        createNew="create"
+        continue;
+    fi;
     args=( "${args[@]}" "$arg" )
 done
 
 # check what arg we were given
 case "${args[0]}" in
     contact?(s))
-        url="https://contacts.google.com"
+        url="https://contacts.google.com/search/${args[@]:1}"
         ;;
     map?(s))
-        url="https://www.google.com/maps"
+        url="https://www.google.nl/maps/search/${args[@]:1}"
         ;;
     hangout?(s))
         url="https://hangouts.google.com"
@@ -79,7 +87,7 @@ case "${args[0]}" in
         url="https://translate.google.com"
         ;;
     mail)
-        url="https://mail.google.com"
+        url="https://mail.google.com#search/${args[@]:1}"
         ;;
     drive)
         url="https://drive.google.com"
@@ -91,13 +99,16 @@ case "${args[0]}" in
         url="https://keep.google.com"
         ;;
     doc?(s))
-        url="https://docs.google.com/document"
+        url="https://docs.google.com/document/$createNew"
         ;;
     sheet?(s))
-        url="https://docs.google.com/spreadsheets"
+        url="https://docs.google.com/spreadsheets/$createNew"
         ;;
     slide?(s))
-        url="https://docs.google.com/presentation"
+        url="https://docs.google.com/presentation/$createNew"
+        ;;
+    draw?(ing))
+        url="https://docs.google.com/drawings/$createNew"
         ;;
     url)
         # cut out the 'url' part of args
@@ -110,6 +121,7 @@ case "${args[0]}" in
     *)
         # if no [valid] action given try default
         # if default action is empty or invalid fall back to search
+        # NOTE: Keep this part in case someone has a non valid default action, maybe find a prettier solution
         if [[ "$bash_google_default_action" -ne 1 ]]; then
             # set a flag so we dont loop
             export bash_google_default_action=1
@@ -122,8 +134,8 @@ case "${args[0]}" in
         exit $?
 esac
 
-# fire up the browser and make sure we dont receive no output
+# fire up the browser and redirect output to '/dev/null'. Also make it a background job
 "$browser_bin" $flags "$url" > /dev/null 2>&1 &
 
-# disown
+# disown job so it won't receive a SIG if parent process quits
 disown
