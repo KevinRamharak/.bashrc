@@ -26,6 +26,3 @@ alias l='ls -CF'
 
 ## alias 'tree' to ignore 'vendor|node_modules'
 alias tree='tree -I "vendor|node_modules"'
-
-## ssh for raspberry pi kerk
-alias ssh_kerk='ssh -p 20022 pi@pi-kerk -i /home/kevin/.pi/id_rsa'
