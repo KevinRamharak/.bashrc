@@ -17,7 +17,7 @@ export LANG=en_US.UTF-8
 
 # Export stuff for '~/bin/google'
 export browser_bin="chromium" # path to binary executable of your browser (chrom{e,ium}|firefox)
-export default_action="search"# see 'google -h' for valid actions, invalid action falls back on search
+export default_action="search" # see 'google -h' for valid actions, invalid action falls back on search
 
 # Disable PC speaker because it scares me and is annoying
 xset b off
