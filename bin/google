@@ -12,7 +12,7 @@ fi
 shopt -s extglob
 
 # usage string : could use "" to avoid using 'cat'
-usage=$(cat <<USAGE
+usage="
 google [-h|--help] [-n|--new-window] [-C|--create] [ACTION='search'] [...ARGS]
     OPTIONS:
         -h, --help          -   Show this message and exit
@@ -43,8 +43,7 @@ Simple script that enables the user to quickly open their favorite Google Servic
 @author  : Kevin Ramharak <kevin@ramharak.nl>
 @version : 1
 @git     : https://github.com/KevinRamharak/.bashrc
-USAGE
-)
+"
 
 # loop trough args
 declare -a args
