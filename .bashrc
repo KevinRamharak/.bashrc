@@ -150,4 +150,4 @@ fi
 # log -> (['error',]  ...string) => write to stdout (stderr if first arg is 'error')
 # include -> (file) => sources '${file}.bash' from current working directory or '~/bin/'
 # require -> (file) => same as include but exits on failure
-# NOTE: This is a really crude import system, only usefull to 
+# NOTE: This is a really crude import system, only usefull for syntactic sugar reasons
