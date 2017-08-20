@@ -1,15 +1,20 @@
 #!/bin/bash
 
-# if option is set to "true" you can pass options to the 'google' script
-# EXAMPLE: `youtube something cool --new-window` or `youtube -`
-# NOTE:    This does print the help message to /dev/null if you pass -h|--help
-# @TODO:   Do some own argument parsing instead of blindly passing them on
-if [[ -z "$pass_flags" ]]; then
-    pass_flags="true"
+# config(ish) - If you want to set these at startup put these inside your '.bashrc'
+if [[ -z "$browser_bin" ]]; then
+    browser_bin="chromium"  # name/path of your browser executable
 fi
 
+# enable extended glob pattern matching
+shopt -s extglob
+
 usage="
-youtube [...ARGS]
+youtube [...OPTIONS] [...ARGS]
+    OPTIONS:
+        -h, --help          -   Show this message and exit
+        -n, --new-window    -   Open in a new window
+        -I, --incognito     -   Use incognito mode (chrom{e,ium})
+        -P, --private       -   Use private mode   (firefox)
 
 Simple script that passes args as search query on youtube
 @note    : Uses the 'google' script found in the repository link below
@@ -17,13 +22,40 @@ Simple script that passes args as search query on youtube
 @git     : https://github.com/KevinRamharak/.bashrc
 "
 
-if [[ -x $(which google) ]]; then
-    if [[ "$pass_flags" == "true" ]]; then
-        # /dev/null in case of the -h|--help flag
-        google url "https://www.youtube.com/results?search_query=$@" > /dev/null
-    else
-        google url "https://www.youtube.com/results?search_query=$*"
+# loop trough args
+declare -a args
+for arg in "$@"; do
+    # search for help flag
+    if [[ "$arg" =~ ^(-h|--help)$ ]]; then
+        echo "$usage"
+        exit 1;
     fi
-else
-    echo "Could not find 'google' as executable, make sure it is installed and available in PATH" >&2
-fi
+    # search for new window flag
+    if [[ "$arg" =~ ^(-n|--new-window)$ ]]; then
+        flags="$flags --new-window"
+        continue;
+    fi;
+
+    # search for incognito flag
+    if [[ "$arg" =~ ^(-I|--incognito)$ ]]; then
+        flags="$flags --incognito"
+        continue;
+    fi;
+
+    # search for private flag
+    if [[ "$arg" =~ ^(-P|--private)$ ]]; then
+        privateWindow="--private-window"
+        continue;
+    fi;
+
+    args=( "${args[@]}" "$arg" )
+done
+
+url="https://www.youtube.com/results?search_query=${args[@]}"
+
+# fire up the browser and redirect output to '/dev/null'. Also make it a background job
+# $privateWindow should prefix $url because of firefox
+"$browser_bin" $flags "$privateWindow" "$url" > /dev/null 2>&1 &
+
+# disown job so it won't receive a SIG if parent process quits
+disown
