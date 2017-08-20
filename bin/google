@@ -13,7 +13,7 @@ shopt -s extglob
 
 # usage string : could use "" to avoid using 'cat'
 usage="
-google [-h|--help] [-n|--new-window] [-C|--create] [ACTION='search'] [...ARGS]
+google [...OPTIONS] [ACTION = 'search'] [...ARGS]
     OPTIONS:
         -h, --help          -   Show this message and exit
         -n, --new-window    -   Open in a new window
@@ -40,6 +40,7 @@ google [-h|--help] [-n|--new-window] [-C|--create] [ACTION='search'] [...ARGS]
         draw[ing]           -   open Google Drawings
 
 Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser (or Firefox)
+@note    : OPTION(S) do not require to be upfront, but cannot be used as arguments
 @author  : Kevin Ramharak <kevin@ramharak.nl>
 @version : 1
 @git     : https://github.com/KevinRamharak/.bashrc
