@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# if option is set to "true" you can pass options to the 'google' script
+# EXAMPLE: `youtube something cool --new-window` or `youtube -`
+# NOTE:    This does print the help message to /dev/null if you pass -h|--help
+# @TODO:   Do some own argument parsing instead of blindly passing them on
+if [[ -z "$pass_flags" ]]; then
+    pass_flags="true"
+fi
+
+usage="
+youtube [...ARGS]
+
+Simple script that passes args as search query on youtube
+@note    : Uses the 'google' script found in the repository link below
+@author  : Kevin Ramharak <kevin@ramharak.nl>
+@git     : https://github.com/KevinRamharak/.bashrc
+"
+
+if [[ -x $(which google) ]]; then
+    if [[ "$pass_flags" == "true" ]]; then
+        # /dev/null in case of the -h|--help flag
+        google url "https://www.youtube.com/results?search_query=$@" > /dev/null
+    else
+        google url "https://www.youtube.com/results?search_query=$*"
+    fi
+else
+    echo "Could not find 'google' as executable, make sure it is installed and available in PATH" >&2
+fi
