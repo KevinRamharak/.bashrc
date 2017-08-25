@@ -2,7 +2,7 @@
 
 # USAGE:
 # array ACTION ARGS...
-#   create : array new NAME
+#   new    : array new NAME
 #   get    : $(array get NAME KEY)
 #   set    : array set NAME KEY VALUE
 #
