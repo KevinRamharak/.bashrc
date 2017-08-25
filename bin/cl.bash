@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # cool function to combine cd and ls
-function cl {
+cl() {
     if [[ $# -eq 0 ]]; then
         ls -l
     else
