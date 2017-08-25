@@ -7,7 +7,7 @@
 #                full filepath
 #                filepath as in ~/bin/$FILE_PATH
 
-function import {
+import() {
     if [ $# -eq 0 ]; then return 1; fi; # no args
     case $1 in
         -h|--help)
