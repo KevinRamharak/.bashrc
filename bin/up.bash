@@ -1,5 +1,5 @@
 ## cool function to up a directory for $N = 1 times
-function .. {
+..() {
     if [[ -z "$1" || "$1" != +([0-9]) ]]; then
         local n=1
     else
