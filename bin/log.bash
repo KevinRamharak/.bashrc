@@ -4,7 +4,7 @@
 #     error - if first string equals 'error' it will print to 'stderr'
 #     MESSAGE - all other args will be concatenatted as one message
 
-function log {
+log() {
     if [[ "$#" -eq 0 ]]; then return 0; fi
     case $1 in
         -h|--help)
@@ -15,14 +15,10 @@ log [error] MESSAGE...
 _USAGE
         ;;
         error)
-            if [[ "$log_mode" -eq 1 || "$log_mode" -eq 3 ]]; then
-                echo -e "ERROR: ${@:2}" >&2
-            fi
+            echo -e "ERROR: ${@:2}" >&2
             ;;
         *)
-            if [[ "$log_mode" -gt 2 ]]; then
-                echo -e "$@"
-            fi
+            echo -e "$@"
             ;;
     esac
 }
