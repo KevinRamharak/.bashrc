@@ -24,38 +24,8 @@ xset b off
 
 . "$HOME/.bash_aliases"
 
-# cool function to combine cd and ls
-function cl {
-    if [[ $# -eq 0 ]]; then
-        ls -l
-    else
-        cd "$1" && ls -l
-    fi
-}
-
-## cool function to combine mkdir and cd
-function cdir {
-    if [[ $# -eq 0 ]]; then
-        return
-    else
-        mkdir -p "$1" && cd "$1"
-    fi
-}
-
-## cool function to up a directory for $N = 1 times
-function .. {
-    if [[ -z "$1" || "$1" != +([0-9]) ]]; then
-        local n=1
-    else
-        local n="$1"
-    fi
-
-    while [[ "$n" -ne 0 ]]; do
-        ((n--))
-        cd ./..
-    done
-}
-
+# @TODO: export this to use 'import'
+# @NOTE: could use 'import version'
 # color escape codes
 # NOTE: Needs bash 4.0 (?) or higher
 declare -A fg_color_map
@@ -136,18 +106,17 @@ function set_color {
     "set_${type}_color" "$color"
 }
 
-export fg_color
-export bg_color
-
 ## bash prompt
 # NOTE: this could be made more readable and compact by using "``" or "${}" syntax and the above defined functions
 PS1="${fg_color_map[light_red]}[${fg_color_map[light_blue]}\u@\h${fg_color_map[light_red]}]${fg_color_map[light_red]}[${fg_color_map[light_green]}\w${fg_color_map[light_red]}] ${fg_color_map[dark_grey]}\$${fg_color_map[default]} "
 
-## custom util functions
-if [[ -f ~/bin/util.bash ]]; then
-    source ~/bin/util.bash
+## custom util functions made available with 'import FUNCTION'
+## see '~/bin/import.bash' for more info
+if [[ -f ~/bin/import.bash ]]; then
+    source ~/bin/import.bash
+
+    # import stuff we always want
+    import cl
+    import cdir
+    import up # .. function
 fi
-# log -> (['error',]  ...string) => write to stdout (stderr if first arg is 'error')
-# include -> (file) => sources '${file}.bash' from current working directory or '~/bin/'
-# require -> (file) => same as include but exits on failure
-# NOTE: This is a really crude import system, only usefull for syntactic sugar reasons
