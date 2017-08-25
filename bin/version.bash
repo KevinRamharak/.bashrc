@@ -10,7 +10,7 @@
 # import dependecies
 import log
 
-function version {
+version() {
     if [[ $# -eq 0 ]] then return 1; fi # no args
     local regex="^"
     case $1 in
