@@ -35,7 +35,7 @@ function array {
             cat << _USAGE
 array ACTION ARGS...
     ACTION:
-        create - array new NAME
+        new    - array new NAME
         get    - array get NAME KEY
                - var=$(array get NAME KEY)
         set    : array set NAME KEY VALUE
