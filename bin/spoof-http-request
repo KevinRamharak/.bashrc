@@ -1,0 +1,150 @@
+#!/bin/bash
+
+usage() {
+    echo "spoof-http-request [-h|--help]"
+    echo "spoof-http-request [-v] SERVER [HOST] [URL]"
+    echo "    -h | --help    - print this message and exit"
+    echo "    -v | --verbose - log everything"
+    echo "    SERVER         - The name or ip adress to connect to"
+    echo "    HOST           - The value of the 'Host:' HTTP header | defaults to SERVER"
+    echo "    URL            - The url to request                   | defaults to '/'"
+    echo
+    echo "Depends on:"
+    echo "    netcat as 'nc'"
+    echo "    grep -oP"
+    echo "    sed -r -e"
+    echo
+    echo "Cool things:"
+    echo "    Follows 301 redirects"
+    echo "    will do DNS (Well netcat does that but w/e)"
+    echo "    gives 0 | SUCCESS     exit code when '200 OK'"
+    echo "    gives 1 | ERROR       exit code when the name could not be resolved"
+    echo "    gives 2 | HTTP_ERROR  exit code when we get anything other than a 200|301|302 "
+    echo "    gives 3 | LOOP_ERROR  exit code when we seem to be in an infite loop"
+    echo "    gives 10 | USAGE      exit code when no args | -h | --help"
+    echo
+    echo "Issues:"
+    echo "    Does not work with 'https' since netcat"
+    echo
+    exit 10
+}
+
+log() {
+    if [[ "$verbose_mode" -eq 1 ]]; then
+        echo -e "$*"
+        sleep 1
+    fi
+}
+
+# check if the first flag is help
+case "$1" in
+    -h|--help)
+        usage
+        ;;
+    *)
+        ;;
+esac
+
+# check if the first flag is verbose
+case "$1" in
+    -v|--verbose)
+        verbose_mode=1
+        # shift all params
+        echo "$2" "$3" "$4"
+        set "$2" "$3" "$4"
+        echo "$2" "$3" "$4"
+        ;;
+    *)
+        verbose_mode=0
+        ;;
+esac
+
+# server to make request to
+server="$1"
+if [[ -z "$server" ]]; then
+    usage
+else
+    log "set \$server to: $server\n"
+fi
+
+
+# Host HTTP header value
+host="$2"
+if [[ -z "$host" ]]; then
+    host="$server"
+    log "set \$host to: $host\n"
+else
+    log "set \$host to: $host\n"
+fi
+
+# url that we request of the server
+url="$3"
+if [[ -z "$url" ]]; then
+    url="/"
+    log "set \$url to: $url\n"
+else
+    log "set \$url to: $url\n"
+fi
+
+# This block makes sure the script does not get called more than 10 times recursivly
+if [[ -z "$count" ]]; then
+    # if count does not exist set it to 0
+    count=0
+else
+    # if count has reached 10 unset the variable first. Else it will get stuck in the ENV. Exit with appropriate code
+    if [[ "$count" -eq 10 ]]; then
+        unset count;
+        exit 4
+    else
+        # increment count
+        count=$((count + 1))
+    fi
+fi
+export count
+log "request \$count is: $count\n\n"
+
+request="GET $url HTTP/1.1\r\nHost: $2\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36\r\nConnection: close\r\n\r\n"
+log "send \$request: $request\n\n"
+response=$(echo -e "$request" | nc $1 80)
+log "got \$response:\n\n$response\n\n"
+
+# the netcat command failed
+if [[ "$?" -ne 0 ]]; then
+    log "seems like the request failed\n\n"
+    exit 1
+fi
+
+# capturing response code
+response_code=$(echo "$response" | head -n 1 | grep -oP '[0-9]{3}');
+log "got \$response_code: $response_code\n\n"
+
+case "$response_code" in
+    200)
+        log "outputting result for 200:\n"
+        echo "$response\n\n"
+        exit 0
+        ;;
+    301|302)
+        log "received 301|302\n"
+        location=$(echo "$response" | grep -oP 'Location: (.+)')
+        log "\$location: $location\n"
+        location=$(echo "$location" | sed -r -e 's/Location: https?:\/\/([^.]+[.])?([^.]+[.][a-z]{2,3})(.+)/\1\2 \3/g')
+        log "\$location: $location\n"
+        url=$(echo "$location" | sed -r -e 's/[^ ]+ (.+)/\1/g')
+        log "\$url: $url\n"
+        location=$(echo "$location" | sed -r -e 's/([^ ]+)( .+)/\1/g');
+        log "\$location: $location\n"
+        log "making new request: spoof-http-request $location $host $url\n"
+        if [[ "$verbose_mode" -eq 1 ]]; then
+            spoof-http-request --verbose "$location" "$host" "$url"
+        else
+            spoof-http-request "$location" "$host" "$url"
+        fi
+        exit $?;
+        ;;
+    *)
+        log "'$response_code' for:\n\t$server\n\t$host\n\t$url\n\n"
+        exit 2
+        ;;
+esac
+

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/opt/visual-studio-code/code "$@" >/dev/null 2>/dev/null &
+disown
