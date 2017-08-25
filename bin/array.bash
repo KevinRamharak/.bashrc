@@ -14,7 +14,7 @@ import log
 # do a version check
 version 4 3
 
-function array {
+array() {
     if [ $# -eq 0 ]; then return 1; fi; # no args
     case $1 in
         new)
