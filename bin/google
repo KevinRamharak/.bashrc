@@ -1,11 +1,15 @@
 #!/bin/bash
 
+## @TODO: Read these from some config file instead of setting these in some sourced bash script
 # config(ish) - If you want to set these at startup put these inside your '.bashrc'
 if [[ -z "$browser_bin" ]]; then
     browser_bin="chromium"  # name/path of your browser executable
 fi
 if [[ -z "$default_action" ]]; then
     default_action="search" # any valid action; defaults to 'search' when invalid or empty action
+fi
+if [[ -z "$default_flags" ]]; then
+    default_flags="-n" # id prefer opening a new window most of the time
 fi
 
 # enable extended glob pattern matching
@@ -22,7 +26,8 @@ google [...OPTIONS] [ACTION = 'search'] [...ARGS]
         -P, --private       -   Use private mode   (firefox)
 
     ACTION:
-        url                 -   open Chromium with 'ARGS' as url
+        url                 -   open browser with 'ARGS' as url
+        file                -   open browser with 'ARGS' as 'file://' url
         search              -   do a Google Search with 'ARGS' as query
         contact[s]          -   open Google Contacts [with 'ARGS' as search query]
         map[s]              -   open Google Maps [with 'ARGS' as search query]
@@ -42,13 +47,12 @@ google [...OPTIONS] [ACTION = 'search'] [...ARGS]
 Simple script that enables the user to quickly open their favorite Google Service in their Chrom{e,ium} browser (or Firefox)
 @note    : OPTION(S) do not require to be upfront, but cannot be used as arguments
 @author  : Kevin Ramharak <kevin@ramharak.nl>
-@version : 1
 @git     : https://github.com/KevinRamharak/.bashrc
 "
 
 # loop trough args
 declare -a args
-for arg in "$@"; do
+for arg in "$@" $default_flags; do
     # search for help flag
     if [[ "$arg" =~ ^(-h|--help)$ ]]; then
         echo "$usage"
@@ -111,7 +115,7 @@ case "${args[0]}" in
         url="https://calendar.google.com"
         ;;
     keep)
-        url="https://keep.google.com"
+        url="https://keep.google.com/$createNew"
         ;;
     doc?(s))
         url="https://docs.google.com/document/$createNew"
@@ -124,6 +128,9 @@ case "${args[0]}" in
         ;;
     draw?(ing))
         url="https://docs.google.com/drawings/$createNew"
+        ;;
+    file)
+        url="file://$(realpath ${args[@]:1})"
         ;;
     url)
         # cut out the 'url' part of args
