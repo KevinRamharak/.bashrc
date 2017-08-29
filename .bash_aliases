@@ -24,5 +24,8 @@ alias ll='ls -lF'
 alias la='ls -A'
 alias l='ls -CF'
 
+## since i got used to 'vscode' instead of 'code'
+alias vscode='code'
+
 ## alias 'tree' to ignore 'vendor|node_modules'
 alias tree='tree -I "vendor|node_modules"'
