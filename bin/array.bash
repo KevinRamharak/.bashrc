@@ -29,7 +29,7 @@ array() {
         get)
             if [ $# -ne 3 ]; then return 1; fi;
             declare -n local_array="$2";
-            echo ${local_array[$3]};
+            echo -en "${local_array[$3]}";
         ;;
         set)
             if [ $# -ne 4 ]; then return 1; fi;
