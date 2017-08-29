@@ -8,7 +8,7 @@
 
     while [[ "$n" -ne 0 ]]; do
         ((n--))
-        cd ./..
+        cd ..
     done
 }
 
