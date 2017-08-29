@@ -2,11 +2,10 @@
 
 # cool function to combine cd and ls
 cl() {
-    if [[ $# -eq 0 ]]; then
-        ls -l
-    else
-        cd "$1" && ls -l
+    if [[ $# -ne 0 ]]; then
+        cd "$1"
     fi
+    ls -l
 }
 
 export -f cl
