@@ -110,6 +110,7 @@ _USAGE
 
     if [ -z "$echoString" ]; then
         log error "color: '$color' is not a valid color"
+        return 1;
     else
         echo -en "$echoString"
     fi
