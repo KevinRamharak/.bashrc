@@ -11,112 +11,35 @@ PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 ## enable extensive pattern matching
 shopt -s extglob
 
-# Prevent LC_CTYPE error
+## prevent LC_CTYPE error
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-# Export stuff for '~/bin/google'
-export browser_bin="chromium" # path to binary executable of your browser (chrom{e,ium}|firefox)
-export default_action="search" # see 'google -h' for valid actions, invalid action falls back on search
-
-# Disable PC speaker because it scares me and is annoying
+## Disable PC speaker because it scares me and is annoying
 xset b off
 
+## source aliases
 . "$HOME/.bash_aliases"
-
-# @TODO: export this to use 'import'
-# @NOTE: could use 'import version'
-# color escape codes
-# NOTE: Needs bash 4.0 (?) or higher
-declare -A fg_color_map
-declare -A bg_color_map
-fg_color_map=(
-    ['default']="\e[39m"
-    ['black']="\e[30m"
-    ['red']="\e[31m"
-    ['green']="\e[32m"
-    ['yellow']="\e[33m"
-    ['blue']="\e[34m"
-    ['magenta']="\e[35m"
-    ['cyan']="\e[36m"
-    ['light_grey']="\e[37m"
-    ['dark_grey']="\e[90m"
-    ['light_red']="\e[91m"
-    ['light_green']="\e[92m"
-    ['light_yellow']="\e[93m"
-    ['light_blue']="\e[94m"
-    ['light_magenta']="\e[95m"
-    ['light_cyan']="\e[96m"
-    ['white']="\e[97m"
-)
-bg_color_map=(
-    ['default']='\e[49m'
-    ['black']='\e[40m'
-    ['red']='\e[41m'
-    ['green']='\e[42m'
-    ['yellow']='\e[43m'
-    ['blue']='\e[44m'
-    ['magenta']='\e[45m'
-    ['cyan']='\e[46m'
-    ['light_grey']='\e[47m'
-    ['dark_grey']='\e[100m'
-    ['light_red']='\e[101m'
-    ['light_green']='\e[102m'
-    ['light_yellow']='\e[103m'
-    ['light_blue']='\e[104m'
-    ['light_magenta']='\e[105m'
-    ['light_cyan']='\e[106m'
-    ['white']='\e[107m'
-)
-
-function set_fg_color {
-    if [[ -z "$1" ]]; then
-        local color='default'
-    else
-        local color="$1"
-    fi
-    echo -en "${fg_color_map[$color]}"
-}
-
-function set_bg_color {
-    if [[ -z "$1" ]]; then
-        local color='default'
-    else
-        local color="$1"
-    fi
-    echo -en "${bg_color_map[$color]}"
-}
-
-function set_color {
-    case "$1" in
-        -f)
-            local type='fg'
-            local color="$2"
-            ;;
-        -b)
-            local type='bg'
-            local color="$2"
-            ;;
-        *)
-            local type='fg'
-            local color="$1"
-            ;;
-    esac
-
-    "set_${type}_color" "$color"
-}
-
-## bash prompt
-# NOTE: this could be made more readable and compact by using "``" or "${}" syntax and the above defined functions
-PS1="${fg_color_map[light_red]}[${fg_color_map[light_blue]}\u@\h${fg_color_map[light_red]}]${fg_color_map[light_red]}[${fg_color_map[light_green]}\w${fg_color_map[light_red]}] ${fg_color_map[dark_grey]}\$${fg_color_map[default]} "
 
 ## custom util functions made available with 'import FUNCTION'
 ## see '~/bin/import.bash' for more info
+## @NOTE: maybe use '$HOME' instead of '~'
 if [[ -f ~/bin/import.bash ]]; then
     source ~/bin/import.bash
 
-    # import stuff we always want
+    # simple stuff that is usefull
     import cl
     import cdir
-    import up # .. function
+    import up # '..' function
+
+    # needed for prompt
+    import color # @NOTE: this also imports 'version|log|array'
 fi
+
+## bash prompt
+red=$(color light_red)
+blue=$(color light_blue)
+green=$(color light_green)
+grey=$(color grey)
+default=$(color default)
+PS1="$red[$blue\u@\h$red]$red[$green\w$red] $grey\$$default "
