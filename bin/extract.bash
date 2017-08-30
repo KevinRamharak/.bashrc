@@ -19,22 +19,6 @@
 extract () {
     if [ -f $1 ] ; then
         case $1 in
-            -h|--help)
-                cat << _USAGE
-extract ARCHIVE
-  ARCHIVE:
-      *.tar.bz2
-      *.tar.gz
-      *.bz2
-      *.rar
-      *.gz
-      *.tar
-      *.tbz2
-      *.tgz
-      *.zip
-      *.Z
-_USAGE
-            ;;
             *.tar.bz2)  tar xjf $1        ;;
             *.tar.gz)   tar xzf $1        ;;
             *.bz2)      bunzip2 $1        ;;
@@ -51,8 +35,25 @@ _USAGE
             ;;
         esac
     else
-        log error "'$1' is not a valid file"
-        return 1
+        if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+            cat << _USAGE
+extract ARCHIVE
+  ARCHIVE:
+      *.tar.bz2
+      *.tar.gz
+      *.bz2
+      *.rar
+      *.gz
+      *.tar
+      *.tbz2
+      *.tgz
+      *.zip
+      *.Z
+_USAGE
+        else
+            log error "'$1' is not a valid file"
+            return 1
+        fi
     fi
     return 0
 }
